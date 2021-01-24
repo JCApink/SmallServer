@@ -1,6 +1,5 @@
 #include "EventThreadLoop.h"
 #include <functional>
-#include <assert.h>
 
 
 

@@ -1,5 +1,13 @@
 #include "HttpData.h"
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <iostream>
+#include "Channel.h"
+#include "EventLoop.h"
 #include "Util.h"
+#include "time.h"
+
 
 
 
@@ -19,23 +27,30 @@ HttpData::HttpData(EventLoop* e, int fd)
 }
 
 HttpData::~HttpData(){
-    //close(FD);
+    //std::cout << "close:" << FD << std::endl;
+    close(FD);
 }
 
 SP_Channel HttpData::getChannel(){
     return channel;
 }
 void HttpData::reset(){
-    timer->clearReq();
-    timer.reset();
+    if(timer.lock()) {
+        std::shared_ptr<TimerNode> mytime(timer.lock());
+        mytime->clearReq();
+        mytime.reset();
+    }
 }
 
 void HttpData::seperateTimer(){
-    timer->clearReq();
-    timer.reset();
+    if(timer.lock()) {
+        std::shared_ptr<TimerNode> mytime(timer.lock());
+        mytime->clearReq();
+        mytime.reset();
+    }
 }
 
-void HttpData::linkTimer(std::shared_ptr<Timer>  mtimer){
+void HttpData::linkTimer(std::shared_ptr<TimerNode> mtimer){
     timer = mtimer;
 }
 
@@ -47,7 +62,7 @@ void HttpData::closeHandle(){
 void HttpData::newConnectEvent(){
     channel->setEvents(EPOLLET | EPOLLIN);
     LOG << "INFO: NEW CONNECTCHANNEL IN HTTPDATA ";
-    LOG << "INFO: EpollFd: " << eventloop->getepoll();
+    LOG << "INFO: EpollFd: ";
     eventloop->getepoll()->epoll_add(channel, timeout);
 }
 
@@ -59,6 +74,7 @@ void HttpData::ReadHandle(){
     int start_line = 0;
     CHECK_STATE checkstate = CHECK_STATE_REQUESTLINE;
     data_read = readn(FD, InBuffer);
+    //std::cout << "number" << std::endl;
     //std::cout << InBuffer << std::endl;
     if(httpstate == CLOSED_CONNECTION){
         InBuffer.clear();
@@ -70,10 +86,8 @@ void HttpData::ReadHandle(){
         HTTP_CODE httpstate = parse_content( &InBuffer.front(), checked_index, checkstate, read_index, start_line );
         if( httpstate == NO_REQUEST || httpstate == GET_REQUEST) {
             WriteHandle(FD, 200, "SUCESS");
-            close(FD);
-            //std::cout << "write" << std::endl;
         } else {
-            std::cout << "write" << std::endl;
+            //std::cout << "write" << std::endl;
             WriteHandle(FD, 404, "ERROR");
         }
     }
@@ -87,6 +101,9 @@ void HttpData::WriteHandle(){
 }
 */
 void HttpData::ConnHandle(){
+    //std::cout << "time" << std::endl;
+    seperateTimer();
+    //std::cout << "time" << std::endl;
     uint32_t& event = channel->getEvent();
     if(httpstate == GET_REQUEST){
         if(event != 0){
@@ -110,6 +127,7 @@ void HttpData::ConnHandle(){
             eventloop->getepoll()->epoll_mod(channel, time);
         }
     } else {
+        //std::cout << "close" << std::endl;
         eventloop->runInLoop(std::bind(&HttpData::closeHandle, this));
     }
 
@@ -148,7 +166,6 @@ LINE_STATUS HttpData::parse_line( char* buffer, int& checked_index, int& read_in
             return LINE_BAD;
         }
     }
-    //std::cout << "OPEN" << std::endl;
     return LINE_OPEN;
 }
 
@@ -169,7 +186,6 @@ HTTP_CODE HttpData::parse_requestline( char* szTemp, CHECK_STATE& checkstate ){
     char* szMethod = szTemp;
     if ( strcasecmp( szMethod, "GET" ) == 0 ){
         OutBuffer += "GET";
-        //std::cout << OutBuffer << std::endl;
     } else {
         return BAD_REQUEST;
     }
@@ -191,7 +207,6 @@ HTTP_CODE HttpData::parse_requestline( char* szTemp, CHECK_STATE& checkstate ){
     if ( ! szURL || szURL[ 0 ] != '/' ){
         return BAD_REQUEST;
     }
-    //printf( "The request URL is: %s\n", szURL );
     checkstate = CHECK_STATE_KEEP;
     return NO_REQUEST;
 }
@@ -242,7 +257,7 @@ HTTP_CODE HttpData::parse_content( char* buffer, int& checked_index, CHECK_STATE
                 break;
             }
             
-            case CHECK_STATE_KEEP:{
+            case CHECK_STATE_KEEP: {
                 retcode = parse_keep(szTemp, checkstate);
                 break;
             }

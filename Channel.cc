@@ -1,6 +1,15 @@
 #include "Channel.h"
+
+#include <unistd.h>
+#include <cstdlib>
 #include <iostream>
-#include "base/Log.h"
+
+#include <queue>
+
+#include "Epoll.h"
+#include "EventLoop.h"
+#include "Util.h"
+
 
 Channel::Channel(EventLoop* e)
     :eventloop(e)
@@ -93,7 +102,8 @@ void Channel::setHttpData(std::shared_ptr<HttpData> h){
 }
 
 std::shared_ptr<HttpData> Channel::getHttpData(){
-    return httpdata;
+    std::shared_ptr<HttpData> ret(httpdata.lock());
+    return ret;
 }
 
 void Channel::doAllRevents(){

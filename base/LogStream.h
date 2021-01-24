@@ -2,17 +2,6 @@
 #include <memory>
 #include "FixBuffer.h"
 #include "noncopyable.h"
-/*
-    将不同类型进行格式化的类 全部转换成字符串类型,并且存在Buffer中
-    提供接口:
-        添加数据进Buffer中:void append(const char* data, int len);
-        获取当前Buffer：const FixBuffer::ptr& getbuffer() const;
-        清空Buffer：void resetBuffer();
-        Int类型的转换：size_t convert(char buf[], T n);
-        Int格式化：void formatInt(T v);
-        各种类型的转换：
-*/
-
 
 class LogStream : public Noncopyable{
 public:

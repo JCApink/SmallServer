@@ -3,17 +3,6 @@
 #include "noncopyable.h"
 #include "LogStream.h"
 #include "AsyncLogging.h"
-/*
-    日志类  启动AsyncLogging进行日志的输出
-    里面包含一个输出类 进行内容与LogStream连接
-    接口:
-        设置文件名：static void setFilename(std::string& filename);
-        获取文件名：static std::string getFilename() 
-        获取LogStream进行文件输出：LogStream &stream();
-
-        日志时间格式化：void setTime();
-
-*/
 
 class Asynclogging;
 #define LOG Log(__FILE__, __LINE__).stream()

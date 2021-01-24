@@ -4,9 +4,7 @@
 MutexLock::MutexLock(){
     pthread_mutex_init(&mutex, NULL);
 }
-//???
 MutexLock::~MutexLock(){
-    //pthread_mutex_lock(&mutex);
     pthread_mutex_destroy(&mutex);
 }
 

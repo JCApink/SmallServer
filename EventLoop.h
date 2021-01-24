@@ -1,15 +1,27 @@
-#ifndef EVENTLOOP_H
-#define EVENTLOOP_H
+#pragma once
 #include <memory>
 
-#include "base/Thread.h"
-#include "base/ThreadData.h"
-#include "base/MutexLock.h"
+
+
+#include <functional>
+#include <memory>
+#include <vector>
 #include "Channel.h"
 #include "Epoll.h"
-class Channel;
+#include "Util.h"
 
-typedef std::shared_ptr<Channel> SP_Channel;   
+
+#include "base/Thread.h"
+
+
+
+#include "base/ThreadData.h"
+#include "base/MutexLock.h"
+#include "base/Log.h"
+
+//class Channel;
+
+//typedef std::shared_ptr<Channel> SP_Channel;   
 typedef std::function<void()> CallBack;
 
 class Epoll;
@@ -32,17 +44,17 @@ public:
     void assertInCurrentThread();
     
     SP_Channel getChannel();
-    Epoll* getepoll();
+    std::shared_ptr<Epoll> getepoll();
 private:
     bool looping;
     bool quit;
     bool doingfunctions;
     int wakeupfd;
     const pid_t threadId;
-    Epoll* epoll;
-    SP_Channel wakeupchannel;
+    std::shared_ptr<Epoll> epoll;
+    std::shared_ptr<Channel> wakeupchannel;
     std::vector<std::function<void()>> functions; 
     MutexLock mutex;
 };
 
-#endif
+

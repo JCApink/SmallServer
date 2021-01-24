@@ -1,8 +1,11 @@
 #pragma once
-#include <memory>
+#include <sys/epoll.h>
+#include <sys/epoll.h>
 #include <functional>
-#include "EventLoop.h"
-#include "HttpData.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include "Timer.h"
 
 class HttpData;
 class EventLoop;
@@ -43,11 +46,11 @@ private:
     int Fd;
     uint32_t Events;
     uint32_t Revents;
-    std::shared_ptr<HttpData> httpdata;
+    std::weak_ptr<HttpData> httpdata;
     CallBack ReadHandle;
     CallBack WriteHandle;
     CallBack ErrorHandle;
     CallBack ConnHandle;
 };
-
+typedef std::shared_ptr<Channel> SP_Channel;
 

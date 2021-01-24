@@ -1,9 +1,10 @@
-#ifndef EVENTTHREADLOOP_H
-#define EVENTTHREADLOOP_H
+#pragma once
 #include <memory>
 #include "EventLoop.h"
-#include "base/Thread.h"
 #include "base/Condition.h"
+#include "base/MutexLock.h"
+#include "base/Thread.h"
+#include "base/noncopyable.h"
 
 
 class EventThreadLoop{
@@ -21,4 +22,4 @@ private:
     MutexLock mutex;
     Condition cond;
 };
-#endif
+

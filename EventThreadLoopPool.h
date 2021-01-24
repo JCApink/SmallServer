@@ -1,9 +1,12 @@
-#ifndef EVENTTHREADLOOPPOOL_H
-#define EVENTTHREADLOOPPOOL_H
+#pragma once
+
 #include "EventLoop.h"
+#include "EventThreadLoop.h"
+
 #include <memory>
 #include <vector>
-
+#include "base/Log.h"
+#include "base/noncopyable.h"
 
 
 class EventThreadLoopPool{
@@ -22,4 +25,4 @@ private:
     std::vector<EventLoop*> eventloops;
 
 };
-#endif
+

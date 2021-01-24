@@ -1,19 +1,19 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include <sys/epoll.h>
-#include "Timer.h"
+#include <memory>
+#include <unordered_map>
+#include <vector>
 #include "Channel.h"
+#include "HttpData.h"
+#include "Timer.h"
+//#include "Timer.h"
+
+
+//#include "HttpData.h"
 #define MAXFD 10000
 #define EPOLLWAIT_TIME 10000
 
-
-class TimerManager;
-class HttpData;
-class Channel;
-typedef std::shared_ptr<Channel> SP_Channel;
-typedef std::shared_ptr<HttpData> HttpDataptr;
-
+//class TimerManager;
 class Epoll{
 public:
     typedef std::shared_ptr<Epoll> ptr;
@@ -35,8 +35,8 @@ public:
 private:
     int epollFd;
     std::vector<epoll_event> events;
-    std::shared_ptr<TimerManager> timerma;
+    TimerManager timerma;
     std::shared_ptr<Channel> FdChannel[MAXFD];
-    HttpDataptr FdHttp[MAXFD];
+    std::shared_ptr<HttpData> FdHttp[MAXFD];
 };
 

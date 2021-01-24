@@ -1,10 +1,11 @@
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#pragma once
 
 #include <memory>
+#include "Channel.h"
 #include "EventLoop.h"
 #include "EventThreadLoopPool.h"
-#include "Channel.h"
+//#include "Channel.h"
+//#include "Util.h"
 #define MAX_FD 10000
 class TcpServer{
 public:
@@ -19,10 +20,8 @@ private:
     EventThreadLoopPool::ptr threadpool;
     int ThreadNum;
     bool starting;
-    SP_Channel channel;
+    std::shared_ptr<Channel> channel;
     int port;
     int ListenFd;
 
 };
-
-#endif

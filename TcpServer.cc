@@ -2,7 +2,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <iostream>
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <functional>
 #include "Util.h"
+#include "base/Log.h"
 
 
 
@@ -60,6 +65,7 @@ void TcpServer::newConnect(){
         EventLoop* loop = threadpool->getnextloop();
         int ret = setNonBlock(accept_fd);
         assert(ret != -1);
+        //std::cout << "accept_fd" << accept_fd << std::endl;
         std::shared_ptr<HttpData> httpdata(new HttpData(loop, accept_fd));
         httpdata->getChannel()->setHttpData(httpdata);
         //下面这里是处理主线程与子线程的交互问题，因为loop获取的是子线程的loop但是执行时主线程执行，所以这里必须将事件交给

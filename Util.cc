@@ -3,8 +3,7 @@
 #include <assert.h>
 #include <iostream>
 #include "Util.h"
-#include "base/FixBuffer.h"
-#include "base/Log.h"
+
 #include <iostream>
 
 static const int MAX_BUFFER = 4096; 

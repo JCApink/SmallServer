@@ -1,8 +1,8 @@
-#include "Timer.h"
 #include <sys/time.h>
+#include "Timer.h"
 
 
-Timer::Timer(std::shared_ptr<HttpData> requestData, int timeout)
+TimerNode::TimerNode(std::shared_ptr<HttpData> requestData, int timeout)
     :deleted_(false)
     ,SPHttpData(requestData) {
         struct timeval now;
@@ -12,24 +12,24 @@ Timer::Timer(std::shared_ptr<HttpData> requestData, int timeout)
                     (((now.tv_sec % 10000) * 1000) + (now.tv_usec / 1000)) + timeout;
 }
 
-Timer::~Timer(){
-    if (SPHttpData) {
+TimerNode::~TimerNode(){
+    if(SPHttpData) {
         SPHttpData->closeHandle();
     }
 }
 
-Timer::Timer(Timer &tn)
+TimerNode::TimerNode(TimerNode &tn)
     : SPHttpData(tn.SPHttpData), expiredTime_(0){
 
 }
 
-void Timer::update(int timeout){
+void TimerNode::update(int timeout){
     struct timeval now;
     gettimeofday(&now, NULL);
     expiredTime_ =
             (((now.tv_sec % 10000) * 1000) + (now.tv_usec / 1000)) + timeout;
 }
-bool Timer::isValid(){
+bool TimerNode::isValid(){
     struct timeval now;
     gettimeofday(&now, NULL);
     size_t temp = (((now.tv_sec % 10000) * 1000) + (now.tv_usec / 1000));
@@ -41,34 +41,37 @@ bool Timer::isValid(){
         return false;
     }
 }
-void Timer::clearReq(){
+void TimerNode::clearReq(){
     SPHttpData.reset();
     this->setDeleted();
 }
-void Timer::setDeleted(){ 
+void TimerNode::setDeleted(){ 
     deleted_ = true; 
 }
-bool Timer::isDeleted() const{
+bool TimerNode::isDeleted() const{
     return deleted_; 
 }
 
-size_t Timer::getExpTime() const{
+size_t TimerNode::getExpTime() const{
     return expiredTime_; 
 }
+
 
 TimerManager::TimerManager() {}
 
 TimerManager::~TimerManager() {}
 
 void TimerManager::addTimer(std::shared_ptr<HttpData> SPHttpData, int timeout) {
-    SPTimerNode new_node(new Timer(SPHttpData, timeout));
+    SPTimerNode new_node(new TimerNode(SPHttpData, timeout));
     timerNodeQueue.push(new_node);
     SPHttpData->linkTimer(new_node);
 }
 
 void TimerManager::handleExpiredEvent() {
+    //std::cout << "timer" <<std::endl;
   // MutexLockGuard locker(lock);
     while (!timerNodeQueue.empty()) {
+        //std::cout << "tiomer" << std::endl;
         SPTimerNode ptimer_now = timerNodeQueue.top();
         if (ptimer_now->isDeleted()){
             timerNodeQueue.pop();
@@ -80,4 +83,5 @@ void TimerManager::handleExpiredEvent() {
     }
 
 }
+
 

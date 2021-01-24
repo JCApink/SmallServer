@@ -5,7 +5,6 @@
 #include <vector>
 
 void ThreadFunc(){
-    //std::cout <<"doing:"<< pthread_self() << std::endl;
     for(int i = 0; i < 100; ++i){
         LOG << i;
     }

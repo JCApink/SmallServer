@@ -1,9 +1,21 @@
 #include "Epoll.h"
-#include <iostream>
-#include <stdio.h>
-
+#include <assert.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <deque>
+#include <queue>
+#include "Util.h"
 #include "base/Log.h"
 
+
+#include <arpa/inet.h>
+#include <iostream>
+
+
+typedef std::shared_ptr<Channel> SP_Channel;
 static int EPOLLFD = MAXFD;
 static int EPOLLWAIT = EPOLLWAIT_TIME;
 static int n = 0;
@@ -20,19 +32,22 @@ Epoll::~Epoll(){
 void Epoll::epoll_add(std::shared_ptr<Channel> request, int timeout){
     int fd = request->getFd();
     if (timeout > 0){
+        addtime(request, timeout);
         FdHttp[fd] = request->getHttpData();
     }
     struct epoll_event event;
     event.data.fd = fd;
     event.events = request->getEvent();
-    if (epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event) != 0){
+    if (epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event)){
         std::cout  << "ERROR: ADD EVENT ERROR" << std::endl;
+        FdChannel[fd].reset();
     }
     FdChannel[fd] = request;
 }
 
 void Epoll::epoll_mod(std::shared_ptr<Channel> request, int timeout){
     if (timeout > 0){
+        addtime(request, timeout);
     }
     int fd = request->getFd();
     struct epoll_event event;
@@ -52,6 +67,7 @@ void Epoll::epoll_del(SP_Channel request, int timeout){
     if (epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &event)){
         LOG << "DELETE EVENT ERROR";
     }   
+    //std::cout << "fd:" << fd << std::endl; 
     FdChannel[fd].reset();
     FdHttp[fd].reset();
 }
@@ -92,13 +108,13 @@ int Epoll::getEpollFd(){
 }
 
 void Epoll::timesolve() {
-    timerma->handleExpiredEvent();
+    timerma.handleExpiredEvent();
 }
 
 void Epoll::addtime(SP_Channel channel, int timeout) {
     std::shared_ptr<HttpData> http = channel->getHttpData();
     if(http) {
-        timerma->addTimer(http, timeout);
+        timerma.addTimer(http, timeout);
     } else {
         LOG << "add time fault";
     }

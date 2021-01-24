@@ -13,9 +13,9 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unordered_map>
-#include "base/FixBuffer.h"
-#include "EventLoop.h"
+
 #include "Timer.h"
+
 
 
 
@@ -24,7 +24,8 @@
 #define LONGTIMEOUT 2000 * 5 * 1000
 class Channel;
 class EventLoop;
-class Timer;
+class TimerNode;
+class TimerManager;
 
 typedef std::shared_ptr<Channel> SP_Channel;
 
@@ -57,7 +58,7 @@ public:
     SP_Channel getChannel();
     void reset();
     void seperateTimer();
-    void linkTimer(std::shared_ptr<Timer> mtimer);
+    void linkTimer(std::shared_ptr<TimerNode> mtimer);
     void closeHandle();
     void newConnectEvent();
     void ReadHandle();
@@ -78,7 +79,7 @@ private:
     std::string OutBuffer;
     const int timeout = TIMEOUT;
     HTTP_CODE httpstate;
-    std::shared_ptr<Timer>  timer;
+    std::weak_ptr<TimerNode> timer;
     bool keeplive;
 };
 

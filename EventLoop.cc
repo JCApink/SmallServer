@@ -1,13 +1,10 @@
+#include "EventLoop.h"
+#include <sys/epoll.h>
 #include <sys/eventfd.h>
-#include <vector>
-#include <functional>
 #include <iostream>
-#include "Channel.h"
-#include "Epoll.h"
-#include "EventLoop.h"  
-#include "base/Log.h"
 #include "Util.h"
-#include "Channel.h"
+#include "base/Log.h"
+
 int creatEventfd() {
     int fd = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
     assert(fd != -1);
@@ -99,9 +96,8 @@ void EventLoop::loop(){
             channel->doAllRevents();
         }
         DoingFunctions();
-        //epoll->timesolve();
+        epoll->timesolve();
         //超时处理
-        
     }
     looping = false;
 }
@@ -119,7 +115,7 @@ SP_Channel EventLoop::getChannel(){
     return wakeupchannel;
 }
 
-Epoll* EventLoop::getepoll(){
+std::shared_ptr<Epoll> EventLoop::getepoll(){
     return epoll;
 }
 

@@ -4,7 +4,7 @@
 
 使用的模型：线程池 + IO复用（reactor模型）
 
-![](photo\模型 (2).jpg)
+![](https://github.com/JCApink/SmallServer/blob/main/photo/%E6%A8%A1%E5%9E%8B%20(2).jpg)
 
 # 项目中遇到的问题：
 

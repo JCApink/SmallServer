@@ -80,7 +80,7 @@ std::vector<std::shared_ptr<Channel>> Epoll::epoll(){
             LOG << "EPOLL WAIT ERROR";
         }
         std::vector<std::shared_ptr<Channel>> channels = getevents(event_count);
-        if (event_count > 0){
+        if (channels.size() > 0){
             return channels;
         }
     }

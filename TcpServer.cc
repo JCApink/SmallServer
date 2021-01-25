@@ -2,7 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <iostream>
-
+#include <signal.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <functional>
@@ -28,6 +28,16 @@ int newsocket(int port){
     assert(ret != -1);
     return listenfd;
 }
+
+void signal_for_sigpipe() {
+    struct sigaction sa;
+    memset(&sa, '\0', sizeof(sa));
+    sa.sa_handler = SIG_IGN;
+    sa.sa_flags = 0;
+    if (sigaction(SIGPIPE, &sa, NULL)){
+            return;
+    }
+}
 TcpServer::TcpServer(EventLoop* e, int num, int p)
         :eventloop(e)
         ,threadpool(new EventThreadLoopPool(e, num))
@@ -39,6 +49,7 @@ TcpServer::TcpServer(EventLoop* e, int num, int p)
     int n = setNonBlock(ListenFd);
     assert(n != -1);
     channel->setFd(ListenFd);
+    signal_for_sigpipe();
 }
 
 TcpServer::~TcpServer(){

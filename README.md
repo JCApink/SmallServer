@@ -4,7 +4,7 @@
 
 使用的模型：线程池 + IO复用（reactor模型）
 
-![](https://github.com/JCApink/SmallServer/blob/main/photo/%E6%A8%A1%E5%9E%8B%20(2).jpg)
+![](photo\模型 (2).jpg)
 
 # 项目中遇到的问题：
 
@@ -31,7 +31,8 @@ EventLoop* EventThreadLoop::start(){
     {
         MutexLockGuard lock(mutex);
         while(eventloops == nullptr) {
-            //之所以要wait，进行条件变量的处理，是因为虽然我们在后面对子线程初始化的时候有一个countdown(后面解释)，但是在完成初始化时，子线程里面的eventloop需要正确的获取到，同样的也是一个初始化的问题
+            /*之所以要wait，进行条件变量的处理，是因为虽然我们在后面对子线程初始化的时候有一个countdown(后面
+            解释)，但是在完成初始化时，子线程里面的eventloop需要正确的获取到，同样的也是一个初始化的问题*/
             cond.wait();
         }
     }
@@ -51,8 +52,10 @@ void Thread::start(){
         //主线程要等到子线程的变量初始化完以后，才能继续执行。
         /*
         	这里的countdown是我封装的一个类主要使用来解决两个问题：
-        	1.主线程在发起多个子线程，等这些子线程完成初始化以后，主线程才能继续执行。通常用于主线程等待多个子线程完成初始化
-        	2.主线程发起多个子线程，子线程都等待主线程，主线程完成完成其他一些任务之后，通知所有子线程开始执行。通常用于多个子线程等待主线程发起“起跑”命令。
+        	1.主线程在发起多个子线程，等这些子线程完成初始化以后，主线程才能继续执行。
+        		通常用于主线程等待多个子线程完成初始化
+        	2.主线程发起多个子线程，子线程都等待主线程，主线程完成完成其他一些任务之后，
+        		通知所有子线程开始执行。通常用于多个子线程等待主线程发起“起跑”命令。
         	在这里是解决第一个问题
         */
         countdown.wait();
@@ -112,7 +115,9 @@ pthread_cond_signal(&cond); //单个唤醒
 //子线程开始执行了
 eventloop.loop();
 
-//前面那里说到每个子线程会在loop中执行，在每一个eventloop会有一个epoll，子线程间的eventloop是互不相关的，只有子线程与主线程之间会有同步问题
+/*前面那里说到每个子线程会在loop中执行，在每一个eventloop会有一个epoll，子线程间的eventloop是互不相关的，
+	只有子线程与主线程之间会有同步问题
+*/
 void EventLoop::loop(){
     assert(!looping);
     assertInCurrentThread();
@@ -164,7 +169,7 @@ void TcpServer::newConnect(){
         EventLoop* loop = threadpool->getnextloop();
         int ret = setNonBlock(accept_fd);
         assert(ret != -1);
-        //因为这里处理的是http的请求，所以每一个连接会有对应的一个http，并且这个http会有一个文件描述符(是这一个连接的)
+        //因为这里处理的是http的请求，所以每一个连接会有对应的一个http，并且这个http会有一个文件描述符
         std::shared_ptr<HttpData> httpdata(new HttpData(loop, accept_fd));
         httpdata->getChannel()->setHttpData(httpdata);
         //注意：这里的eventloop对象是子线程的，主线程也有自己的eventloop对象
@@ -181,14 +186,23 @@ void EventLoop::queueInLoop(CallBack function){
         //将需要执行的事件放到函数数组中，等待判断是否属于自己当前的线程应该去处理的事情
         functions.emplace_back(std::move(function));
     }
-    //这里就是判断了，因为主线程它有pid，tgid，对于一个主线程来说，它的pid和tgid就是它自己本身。但是对于进程创建的子线程它的pid是它自己，它的tgid才是主线程。因此可以利用它们的pid不同区分是不是属于自己应该执行的任务。(在eventloop对象中已经保存了它们所属的pid具体值)
+    /*这里就是判断了，因为主线程它有pid，tgid，对于一个主线程来说，它的pid和tgid就是它自己本身。
+    	但是对于进程创建的子线程它的pid是它自己，它的tgid才是主线程。因此可以利用它们的pid不同区
+    	分是不是属于自己应该执行的任务。(在eventloop对象中已经保存了它们所属的pid具体值)
+    */
+    /*
+    	这里这样判断一个是是否当前线程在执行，另一个是如果是当前线程在执行，但是此时有另外的IO线程在dongFunction，
+    	那么同样需要唤醒
+    	
+    	简单来说，就是只有在自己IO线程在调用这个才不用唤醒
+    */
     if(!InCurrentThread() || doingfunctions){
         //如果当前不是自己的应该处理的，那么就唤醒
         wakeupwrite();
     }
 }
 
-//下面这里是程序设计的很巧的一个地方，采用eventfd进行异步唤醒，当然也可以采用管道等方式进行唤醒，它的唤醒过程是向套接字中写入1个字节，此时，阻塞在epoll_wait的对应线程就会被唤醒，来处理这一个事件，它就要读出来，唤醒之后就会处理刚刚放进事件数组中的事件，这样就达到了交换文件描述符的目的了
+//下面这里是程序设计的很巧的一个地方，采用eventfd进行异步唤醒，当然也可以采用管道等方式进行唤醒（但是采用eventfd会更加的高效），它的唤醒过程是向套接字中写入1个字节，此时，阻塞在epoll_wait的对应线程就会被唤醒，来处理这一个事件，它就要读出来，唤醒之后就会处理刚刚放进事件数组中的事件，这样就达到了交换文件描述符的目的了
 int creatEventfd() {
     int fd = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
     assert(fd != -1);
@@ -218,10 +232,33 @@ void EventLoop::wakeupread(){
 
 处理该模型的精髓是正确处理主线程和子线程eventloop对象之间的关系，一方面这样能够提高并发度，减少锁的竞争，锁之间的竞争只会发生在主线程和子线程之间，子线程和子线程间没有锁的竞争。另一方面，弄懂这个，整个reactor模型也就更加的清晰了。
 
-还有一些最近几天补充......
+## 3.有点小坑的SIGPIPE信号
+
+一开始我在测试的时候，会发现，当测试完成的时候，进程老是自己退出，这就让我觉得很奇怪，我设计的明明没有让它自己退出，为什么进程会自己退出呢？
+
+后来我就利用gdb进行调试，就会发现会产生一个SIGPIPE信号，因为之前看书有点印象，之后知道原因，原来是因为四次挥手的时候，如果客户端关闭了，但是服务端还有数据要发送，但是客户端已经关了，这是服务端会收到RST报文，此时主机收到一个SIGPIPE信号，那么就会导致进程退出。解决的办法很简单，那就是直接忽略这个信号就行了。
+
+![](photo\SIGPIPE.png)
+
+```c++
+void signal_for_sigpipe() {
+    struct sigaction sa;
+    memset(&sa, '\0', sizeof(sa));
+    sa.sa_handler = SIG_IGN;
+    sa.sa_flags = 0;
+    if (sigaction(SIGPIPE, &sa, NULL)){
+            return;
+    }
+}
+```
+
+## 4.遇到了一次请求后，一直在等待，测试没有出结果，但是如果终止进程又会出现结果
+
+造成这样的原因很容易找到，很明显的就是服务端在结束通信的时候没有进行四次挥手的过程，只有客户端发送了FIN，但是服务端没有进行响应，后来发现是由于智能指针的循环引用导致，解决方案是将类中的智能指针改成weak_ptr，之后再进行相应的处理。
 
 # 项目测试结果：
 
-ab 进行压测时，一千个客户端，一百万次请求，长连接测试：
+ab 进行压测时，一千个客户端，一百万次请求
 
 <img src="photo\测试结果.png" style="zoom: 80%;" />
+

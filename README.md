@@ -191,7 +191,8 @@ void EventLoop::queueInLoop(CallBack function){
     	分是不是属于自己应该执行的任务。(在eventloop对象中已经保存了它们所属的pid具体值)
     */
     /*
-    	这里这样判断一个是是否当前线程在执行，另一个是如果是当前线程在执行，但是此时有另外的IO线程在dongFunction，
+    	这里这样判断一个是是否当前线程在执行，另一个是如果是当前线程在执行，
+    	但是此时有另外的IO线程在dongFunction，
     	那么同样需要唤醒
     	
     	简单来说，就是只有在自己IO线程在调用这个才不用唤醒
@@ -202,7 +203,10 @@ void EventLoop::queueInLoop(CallBack function){
     }
 }
 
-//下面这里是程序设计的很巧的一个地方，采用eventfd进行异步唤醒，当然也可以采用管道等方式进行唤醒（但是采用eventfd会更加的高效），它的唤醒过程是向套接字中写入1个字节，此时，阻塞在epoll_wait的对应线程就会被唤醒，来处理这一个事件，它就要读出来，唤醒之后就会处理刚刚放进事件数组中的事件，这样就达到了交换文件描述符的目的了
+/*下面这里是程序设计的很巧的一个地方，采用eventfd进行异步唤醒，当然也可以采用管道等方式进行唤醒
+（但是采用eventfd会更加的高效），它的唤醒过程是向套接字中写入1个字节，
+此时，阻塞在epoll_wait的对应线程就会被唤醒，来处理这一个事件，它就要读出来，
+唤醒之后就会处理刚刚放进事件数组中的事件，这样就达到了交换文件描述符的目的了*/
 int creatEventfd() {
     int fd = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
     assert(fd != -1);
@@ -255,6 +259,90 @@ void signal_for_sigpipe() {
 ## 4.遇到了一次请求后，一直在等待，测试没有出结果，但是如果终止进程又会出现结果
 
 造成这样的原因很容易找到，很明显的就是服务端在结束通信的时候没有进行四次挥手的过程，只有客户端发送了FIN，但是服务端响应了ACK，但是并没有进行FIN报文发送，后来发现是由于智能指针的循环引用导致，解决方案是将类中的智能指针改成weak_ptr，之后再进行相应的处理。
+
+## 5.如何进行关闭
+
+首先一种是客户端请求关闭，这种就比较简单了。对于Reactor模型来说，事件分发机制尤为关键，因此在设计的时候，我们要判断是什么事件，这就交给了Channel去管理，每个EventLoop会有一个Channel，并且每个Httpdata(用来处理http请求的类)也有一个。因此在设计的时候事件分发如下：
+
+```C++
+void Channel::doAllRevents(){
+    if((Revents & EPOLLHUP) && !(Revents & EPOLLIN)){
+        return;
+    }
+    if(Revents & EPOLLERR){
+        if(ErrorHandle){
+            ErrorHandle();
+        }
+        return;
+    }
+    if(Revents & (EPOLLIN | EPOLLPRI | EPOLLRDHUP) ){
+        ReadHandle();
+    }
+    if(Revents & EPOLLOUT){
+        WriteHandle();
+    }
+    ConnHandle();
+}
+
+
+/*首先是http请求，毫无疑问会调用读请求，因此直接相对应的函数进行处理，在http处理采用的是
+有限状态机的形式，因此一个完整的http请求会有相对应的状态，之后等客户端发完之后，客户端会发
+一个FIN报文，此时我们也会调用读函数，但是因为不是完整的http报文，因此它的状态就不是我们想要
+的了，所以我们就直接根据判断来关闭。*/
+void HttpData::ConnHandle(){
+    seperateTimer();
+    uint32_t& event = channel->getEvent();
+    if(httpstate == GET_REQUEST){
+        if(event != 0){
+            int time = timeout;
+            if(keeplive) {
+                time = LONGTIMEOUT;
+            }
+            if((event & EPOLLIN) && (event & EPOLLOUT)) {
+                event = uint32_t (0);
+                event |= EPOLLOUT;
+            }
+            event |= EPOLLET;
+            eventloop->getepoll()->epoll_mod(channel, time);
+        } else if (keeplive) {
+            event |= (EPOLLIN | EPOLLET);
+            int time = LONGTIMEOUT;
+            eventloop->getepoll()->epoll_mod(channel, time);
+        } else {
+            event |= (EPOLLIN | EPOLLET);
+            int time = (LONGTIMEOUT >> 1); 
+            eventloop->getepoll()->epoll_mod(channel, time);
+        }
+    } else {
+        //不是想要的状态
+        std::cout << "close" << std::endl;
+        eventloop->runInLoop(std::bind(&HttpData::closeHandle, this));
+    }
+
+}
+```
+
+另一种是对于长连接关闭的，如果客户端不关闭，我们等到自己设定的时间直接close掉，此时就需要维护一个数据结构来处理这个长连接，一般有轮转、二叉树或者堆结构来处理，这里选择了堆结构来处理，使用小根堆，我们可以将短时间的放在最前面，如果有事件需要处理的时候我们就判断是否超时，超时了我们直接reset掉(智能指针的一种析构方式)，这样我们就可以处理长连接的事件了。
+
+## 6.日志模块的设置
+
+```c++
+/*日志模块主要采用单个线程在后台进行写处理，采用的pthread_once这个函数的意思是只执行一次，
+具体由哪个线程去执行，那就要看操作系统了，这样我们前面的线程只要进行写到vector中，后面
+的线程从中读取便可以了*/
+void once_init(){
+    Asynac = new AsynacLogging(Log::getFilename());
+    Asynac->start();
+}
+
+void output(const char* data, int len){
+    //std::cout << "output" <<std::endl;
+    pthread_once(&once_control, &once_init);
+    Asynac->append(data, len);
+}
+```
+
+
 
 # 项目测试结果：
 

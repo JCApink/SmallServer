@@ -11,12 +11,12 @@
 
 
 
-int newsocket(int port){
-    const char* ip = "127.0.0.1";
+int newsocket(char* ip, int port){
+    const char* _ip = ip;
     struct sockaddr_in address;
     bzero( &address, sizeof( address ) );
     address.sin_family = AF_INET;
-    inet_pton( AF_INET, ip, &address.sin_addr );
+    inet_pton( AF_INET, _ip, &address.sin_addr );
     address.sin_port = htons( port );
     
     int listenfd = socket( PF_INET, SOCK_STREAM, 0 );
@@ -35,16 +35,17 @@ void signal_for_sigpipe() {
     sa.sa_handler = SIG_IGN;
     sa.sa_flags = 0;
     if (sigaction(SIGPIPE, &sa, NULL)){
-            return;
+        return;
     }
 }
-TcpServer::TcpServer(EventLoop* e, int num, int p)
+
+TcpServer::TcpServer(EventLoop* e, int num, char* ip, int port)
         :eventloop(e)
         ,threadpool(new EventThreadLoopPool(e, num))
         ,ThreadNum(num)
         ,starting(false)
         ,port(port)
-        ,ListenFd(newsocket(p))
+        ,ListenFd(newsocket(ip, port))
         ,channel(new Channel(e)){
     int n = setNonBlock(ListenFd);
     assert(n != -1);

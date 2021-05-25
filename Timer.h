@@ -1,10 +1,5 @@
 #pragma once
-
-
 #include <iostream>
-//#include "Channel.h"
-
-
 #include <unistd.h>
 #include <deque>
 #include <memory>
@@ -14,8 +9,6 @@
 #include "base/noncopyable.h"
 
 class HttpData;
-
-
 class TimerNode{
 public:
     

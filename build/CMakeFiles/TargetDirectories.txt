@@ -1,0 +1,9 @@
+/home/ubuntu/SmallServer/build/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/SmallServer/build/CMakeFiles/MyWebServer.dir
+/home/ubuntu/SmallServer/build/CMakeFiles/edit_cache.dir
+/home/ubuntu/SmallServer/build/base/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/SmallServer/build/base/CMakeFiles/libserver_base.dir
+/home/ubuntu/SmallServer/build/base/CMakeFiles/edit_cache.dir
+/home/ubuntu/SmallServer/build/base/tests/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/SmallServer/build/base/tests/CMakeFiles/testLogging.dir
+/home/ubuntu/SmallServer/build/base/tests/CMakeFiles/edit_cache.dir

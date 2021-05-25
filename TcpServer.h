@@ -10,7 +10,7 @@
 class TcpServer{
 public:
     typedef std::shared_ptr<TcpServer> ptr;
-    TcpServer(EventLoop* eventloop, int num, int port);
+    TcpServer(EventLoop* eventloop, int num, char* ip, int port);
     ~TcpServer();
     void start();
     void newConnect();

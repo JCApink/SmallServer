@@ -72,7 +72,6 @@ void Channel::doConnHandle(){
 
 void Channel::setFd(int fd){
     Fd = fd;
-    //std::cout << "channel:66 Fd: "<< Fd << std::endl;
 }
 
 int Channel::getFd(){
@@ -80,9 +79,7 @@ int Channel::getFd(){
 }
 
 void Channel::setEvents(uint32_t event){
-    
     Events = event;
-    //std::cout << "channel:76 setEvent Fd: " << Fd << std::endl;
 }
 
 void Channel::setRevents(uint32_t revent){

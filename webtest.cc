@@ -8,7 +8,8 @@ int main(){
     int port = 8089;
     Log::setFilename(path);
     EventLoop mainloop;
-    TcpServer Server(&mainloop, ThreadNum, port);
+    std::string ip = "127.0.0.1";
+    TcpServer Server(&mainloop, ThreadNum, const_cast<char*>(ip.data()), port);
     Server.start();
     mainloop.loop();
     return 1;

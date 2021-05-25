@@ -68,10 +68,7 @@ void TimerManager::addTimer(std::shared_ptr<HttpData> SPHttpData, int timeout) {
 }
 
 void TimerManager::handleExpiredEvent() {
-    //std::cout << "timer" <<std::endl;
-  // MutexLockGuard locker(lock);
     while (!timerNodeQueue.empty()) {
-        //std::cout << "tiomer" << std::endl;
         SPTimerNode ptimer_now = timerNodeQueue.top();
         if (ptimer_now->isDeleted()){
             timerNodeQueue.pop();

@@ -256,7 +256,6 @@ HTTP_CODE HttpData::parse_content( char* buffer, int& checked_index, CHECK_STATE
                 }
                 break;
             }
-            
             case CHECK_STATE_KEEP: {
                 retcode = parse_keep(szTemp, checkstate);
                 break;
@@ -292,7 +291,6 @@ void HttpData::WriteHandle(int fd, int err_num, std::string short_msg) {
     body_buff += "<body bgcolor=\"ffffff\">";
     body_buff += std::to_string(err_num) + short_msg;
     body_buff += "<hr><em> My Web Server</em>\n</body></html>";
-
     header_buff += "HTTP/1.0 " + std::to_string(err_num) + short_msg + "\r\n";
     header_buff += "Content-Type: text/html\r\n";
     header_buff += "Connection: Close\r\n";

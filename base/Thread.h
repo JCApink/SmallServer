@@ -3,11 +3,6 @@
 #include <functional>
 #include "noncopyable.h"
 #include "CountDownLatch.h"
-/*
-    
-
-
-*/
 
 class Thread : public Noncopyable{
 public:
@@ -39,10 +34,6 @@ private:
 
 
     CountDownLatch countdown;
-
-
-
-
 };
 
 

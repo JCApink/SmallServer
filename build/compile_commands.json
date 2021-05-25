@@ -1,0 +1,107 @@
+[
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/Channel.cc.o -c /home/ubuntu/SmallServer/Channel.cc",
+  "file": "/home/ubuntu/SmallServer/Channel.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/Timer.cc.o -c /home/ubuntu/SmallServer/Timer.cc",
+  "file": "/home/ubuntu/SmallServer/Timer.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/EventLoop.cc.o -c /home/ubuntu/SmallServer/EventLoop.cc",
+  "file": "/home/ubuntu/SmallServer/EventLoop.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/EventThreadLoop.cc.o -c /home/ubuntu/SmallServer/EventThreadLoop.cc",
+  "file": "/home/ubuntu/SmallServer/EventThreadLoop.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/EventThreadLoopPool.cc.o -c /home/ubuntu/SmallServer/EventThreadLoopPool.cc",
+  "file": "/home/ubuntu/SmallServer/EventThreadLoopPool.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/HttpData.cc.o -c /home/ubuntu/SmallServer/HttpData.cc",
+  "file": "/home/ubuntu/SmallServer/HttpData.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/webtest.cc.o -c /home/ubuntu/SmallServer/webtest.cc",
+  "file": "/home/ubuntu/SmallServer/webtest.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/TcpServer.cc.o -c /home/ubuntu/SmallServer/TcpServer.cc",
+  "file": "/home/ubuntu/SmallServer/TcpServer.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/Util.cc.o -c /home/ubuntu/SmallServer/Util.cc",
+  "file": "/home/ubuntu/SmallServer/Util.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/MyWebServer.dir/Epoll.cc.o -c /home/ubuntu/SmallServer/Epoll.cc",
+  "file": "/home/ubuntu/SmallServer/Epoll.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/AsyncLogging.cc.o -c /home/ubuntu/SmallServer/base/AsyncLogging.cc",
+  "file": "/home/ubuntu/SmallServer/base/AsyncLogging.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/Condition.cc.o -c /home/ubuntu/SmallServer/base/Condition.cc",
+  "file": "/home/ubuntu/SmallServer/base/Condition.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/CountDownLatch.cc.o -c /home/ubuntu/SmallServer/base/CountDownLatch.cc",
+  "file": "/home/ubuntu/SmallServer/base/CountDownLatch.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/FileAppender.cc.o -c /home/ubuntu/SmallServer/base/FileAppender.cc",
+  "file": "/home/ubuntu/SmallServer/base/FileAppender.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/FixBuffer.cc.o -c /home/ubuntu/SmallServer/base/FixBuffer.cc",
+  "file": "/home/ubuntu/SmallServer/base/FixBuffer.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/Log.cc.o -c /home/ubuntu/SmallServer/base/Log.cc",
+  "file": "/home/ubuntu/SmallServer/base/Log.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/LogFile.cc.o -c /home/ubuntu/SmallServer/base/LogFile.cc",
+  "file": "/home/ubuntu/SmallServer/base/LogFile.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/LogStream.cc.o -c /home/ubuntu/SmallServer/base/LogStream.cc",
+  "file": "/home/ubuntu/SmallServer/base/LogStream.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/MutexLock.cc.o -c /home/ubuntu/SmallServer/base/MutexLock.cc",
+  "file": "/home/ubuntu/SmallServer/base/MutexLock.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/libserver_base.dir/Thread.cc.o -c /home/ubuntu/SmallServer/base/Thread.cc",
+  "file": "/home/ubuntu/SmallServer/base/Thread.cc"
+},
+{
+  "directory": "/home/ubuntu/SmallServer/build/base/tests",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/ubuntu/SmallServer/base  -g   -o CMakeFiles/testLogging.dir/testLogging.cc.o -c /home/ubuntu/SmallServer/base/tests/testLogging.cc",
+  "file": "/home/ubuntu/SmallServer/base/tests/testLogging.cc"
+}
+]
